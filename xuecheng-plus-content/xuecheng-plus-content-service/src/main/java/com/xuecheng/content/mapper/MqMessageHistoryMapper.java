@@ -5,7 +5,7 @@ import com.xuecheng.content.model.po.MqMessageHistory;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author weipengtao

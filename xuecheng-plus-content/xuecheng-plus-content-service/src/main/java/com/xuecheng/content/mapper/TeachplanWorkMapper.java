@@ -1,16 +1,16 @@
 package com.xuecheng.content.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.xuecheng.content.model.po.TeachplanMedia;
+import com.xuecheng.content.model.po.TeachplanWork;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author weipengtao
  * @since 2025-09-16
  */
-public interface TeachplanMediaMapper extends BaseMapper<TeachplanMedia> {
+public interface TeachplanWorkMapper extends BaseMapper<TeachplanWork> {
 
 }

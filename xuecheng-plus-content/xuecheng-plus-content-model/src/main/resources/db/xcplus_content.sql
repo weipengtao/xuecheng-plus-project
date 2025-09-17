@@ -1,8 +1,8 @@
--- Database: content
+-- Database: xcplus_content
 -- ------------------------------------------------------
 -- Server version	8.0.26
-CREATE SCHEMA IF NOT EXISTS `content` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE content;
+CREATE SCHEMA IF NOT EXISTS `xcplus_content` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE xcplus_content;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT = @@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS = @@CHARACTER_SET_RESULTS */;
