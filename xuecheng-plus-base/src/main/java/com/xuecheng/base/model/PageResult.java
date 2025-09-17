@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 public class PageResult<T> implements Serializable {
     @Schema(description = "数据列表")
-    private List<T> list;
+    private List<T> items;
 
     @Schema(description = "总记录数", example = "100")
     private Long counts;

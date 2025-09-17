@@ -27,8 +27,8 @@ public class CourseBaseServiceImpl implements CourseBaseService {
 
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(courseName != null, CourseBase::getName, courseName);
-        queryWrapper.eq(auditStatus != null, CourseBase::getAuditStatus, auditStatus);
-        queryWrapper.eq(publishStatus != null, CourseBase::getStatus, publishStatus);
+        queryWrapper.eq(auditStatus != null && !auditStatus.isEmpty(), CourseBase::getAuditStatus, auditStatus);
+        queryWrapper.eq(publishStatus != null && !publishStatus.isEmpty(), CourseBase::getStatus, publishStatus);
 
         Page<CourseBase> courseBasePage = courseBaseMapper.selectPage(page, queryWrapper);
 
@@ -36,7 +36,7 @@ public class CourseBaseServiceImpl implements CourseBaseService {
                 .counts(courseBasePage.getTotal())
                 .page(pageParams.getPageNo())
                 .pageSize(pageParams.getPageSize())
-                .list(courseBasePage.getRecords())
+                .items(courseBasePage.getRecords())
                 .build();
     }
 }
