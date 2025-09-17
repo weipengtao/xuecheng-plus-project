@@ -29,7 +29,7 @@ public class DictionaryController {
 
     @GetMapping("/code/{code}")
     @Operation(summary = "根据字典代码查询数据字典", description = "通过字典代码获取对应的数据字典")
-    public Dictionary getByCode(@PathVariable("code") @Parameter(description = "数据字典代码", example = "001") String code) {
+    public Dictionary getByCode(@PathVariable @Parameter(description = "数据字典代码", example = "001") String code) {
         return dictionaryService.getByCode(code);
     }
 }

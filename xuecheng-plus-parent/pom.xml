@@ -136,6 +136,10 @@
                     <source>${java.version}</source>
                     <!--指定项目编译后的jdk的版本-->
                     <target>${java.version}</target>
+                    <!-- 关键：保留方法参数名 -->
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                     <!--配置注解预编译-->
                     <annotationProcessorPaths>
                         <path>
