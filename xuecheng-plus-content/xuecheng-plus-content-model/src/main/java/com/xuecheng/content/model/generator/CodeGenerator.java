@@ -5,17 +5,29 @@ import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.model.ClassAnnotationAttributes;
 
 public class CodeGenerator {
+
+    static private final String USERNAME = "root";
+    static private final String PASSWORD = "123456";
+    static private final String MODULE_NAME = "system"; // 根据模块名更改
+
+    static private final String AUTHOR = "weipengtao";
+
     public static void main(String[] args) {
-        FastAutoGenerator.create("jdbc:mysql://localhost:3306/content?serverTimezone=UTC", "root", "123456")
+        String url = "jdbc:mysql://localhost:3306/xcplus_" + MODULE_NAME + "?serverTimezone=UTC";
+
+        String outputDir = System.getProperty("user.dir") + "/xuecheng-plus-" + MODULE_NAME + "/xuecheng-plus-" + MODULE_NAME + "-model" + "/src/main/java";
+        String parentPackage = "com.xuecheng." + MODULE_NAME;
+
+        FastAutoGenerator.create(url, USERNAME, PASSWORD)
                 // 全局配置
                 .globalConfig(builder -> {
-                    builder.author("weipengtao") // 作者
-                            .outputDir("/Users/wpt/project/xuecheng-plus-project/xuecheng-plus-content/xuecheng-plus-content-model/src/main/java") // 输出路径
+                    builder.author(AUTHOR)
+                            .outputDir(outputDir) // 输出路径
                             .disableOpenDir(); // 生成后不自动打开文件夹
                 })
                 // 包配置
                 .packageConfig(builder -> {
-                    builder.parent("com.xuecheng.content") // 父包名
+                    builder.parent(parentPackage) // 父包名
                             .entity("model.po");
                 })
                 // 策略配置
@@ -27,10 +39,8 @@ public class CodeGenerator {
                                 new ClassAnnotationAttributes("@Builder", "lombok.Builder")
                         )
                         .enableSerialAnnotation()
-                        .enableFileOverride()
-                        .mapperBuilder().disable()
-                        // .serviceBuilder().disable()
-                        // .controllerBuilder().disable()
+                        .controllerBuilder().disable()
+                        .serviceBuilder().disable()
                         .enableFileOverride()
                 )
                 // 模板引擎（默认 Velocity）
