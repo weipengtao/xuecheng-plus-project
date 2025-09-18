@@ -79,4 +79,20 @@ public class CourseBaseServiceImpl implements CourseBaseService {
 
         return courseBaseInfoDTO;
     }
+
+    @Override
+    public CourseBaseInfoDTO getCourseBaseInfoById(Long id) {
+        CourseBaseInfoDTO courseBaseInfoDTO = new CourseBaseInfoDTO();
+
+        CourseBase courseBase = courseBaseMapper.selectById(id);
+        BeanUtils.copyProperties(courseBase, courseBaseInfoDTO);
+        CourseMarket courseMarket = courseMarketMapper.selectById(id);
+        BeanUtils.copyProperties(courseBase, courseMarket);
+        CourseCategory courseCategoryBySt = courseCategoryMapper.selectById(courseBase.getSt());
+        courseBaseInfoDTO.setStName(courseCategoryBySt.getName());
+        CourseCategory courseCategoryByMt = courseCategoryMapper.selectById(courseBase.getMt());
+        courseBaseInfoDTO.setMtName(courseCategoryByMt.getName());
+
+        return courseBaseInfoDTO;
+    }
 }

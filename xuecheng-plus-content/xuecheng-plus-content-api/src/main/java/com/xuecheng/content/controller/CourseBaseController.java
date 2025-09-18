@@ -10,10 +10,7 @@ import com.xuecheng.content.service.CourseBaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/content/course")
@@ -34,5 +31,11 @@ public class CourseBaseController {
     public CourseBaseInfoDTO create(@RequestBody AddCourseDTO addCourseDTO) {
         Long companyId = 1232141425L; // TODO 机构ID, 目前硬编码
         return courseBaseService.createCourseBase(companyId, addCourseDTO);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "根据ID查询课程信息", description = "根据课程ID查询课程的基本信息和营销信息")
+    public CourseBaseInfoDTO getById(@PathVariable Long id) {
+        return courseBaseService.getCourseBaseInfoById(id);
     }
 }

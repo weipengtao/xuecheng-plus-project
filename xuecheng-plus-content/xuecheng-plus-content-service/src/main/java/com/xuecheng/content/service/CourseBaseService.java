@@ -11,4 +11,6 @@ public interface CourseBaseService {
     PageResult<CourseBase> pageList(PageParams pageParams, QueryCourseParamsDTO queryCourseParamsDTO);
 
     CourseBaseInfoDTO createCourseBase(Long companyId, AddCourseDTO addCourseDTO);
+
+    CourseBaseInfoDTO getCourseBaseInfoById(Long id);
 }
