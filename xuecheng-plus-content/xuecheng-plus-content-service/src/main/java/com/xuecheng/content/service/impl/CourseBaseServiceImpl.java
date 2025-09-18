@@ -5,17 +5,29 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.mapper.CourseBaseMapper;
+import com.xuecheng.content.mapper.CourseCategoryMapper;
+import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.model.dto.AddCourseDTO;
+import com.xuecheng.content.model.dto.CourseBaseInfoDTO;
 import com.xuecheng.content.model.dto.QueryCourseParamsDTO;
 import com.xuecheng.content.model.po.CourseBase;
+import com.xuecheng.content.model.po.CourseCategory;
+import com.xuecheng.content.model.po.CourseMarket;
 import com.xuecheng.content.service.CourseBaseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class CourseBaseServiceImpl implements CourseBaseService {
 
     private final CourseBaseMapper courseBaseMapper;
+    private final CourseMarketMapper courseMarketMapper;
+    private final CourseCategoryMapper courseCategoryMapper;
 
     @Override
     public PageResult<CourseBase> pageList(PageParams pageParams, QueryCourseParamsDTO queryCourseParamsDTO) {
@@ -38,5 +50,33 @@ public class CourseBaseServiceImpl implements CourseBaseService {
                 .pageSize(pageParams.getPageSize())
                 .items(courseBasePage.getRecords())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public CourseBaseInfoDTO createCourseBase(Long companyId, AddCourseDTO addCourseDTO) {
+        CourseBase courseBase = new CourseBase();
+        BeanUtils.copyProperties(addCourseDTO, courseBase);
+        courseBase.setCompanyId(companyId);
+        courseBase.setAuditStatus("202002"); // TODO 暂时写成魔法值
+        courseBase.setStatus("203001");
+        courseBase.setCreateDate(LocalDateTime.now());  // TODO 待实现自动填充
+        courseBaseMapper.insert(courseBase);
+
+        CourseMarket courseMarket = new CourseMarket();
+        BeanUtils.copyProperties(addCourseDTO, courseMarket);
+        courseMarket.setId(courseBase.getId());
+        courseMarketMapper.insertOrUpdate(courseMarket);
+
+        CourseBaseInfoDTO courseBaseInfoDTO = new CourseBaseInfoDTO();
+        BeanUtils.copyProperties(courseBase, courseBaseInfoDTO);
+        BeanUtils.copyProperties(courseMarket, courseBaseInfoDTO);
+
+        CourseCategory courseCategoryBySt = courseCategoryMapper.selectById(courseBase.getSt());
+        courseBaseInfoDTO.setStName(courseCategoryBySt.getName());
+        CourseCategory courseCategoryByMt = courseCategoryMapper.selectById(courseBase.getMt());
+        courseBaseInfoDTO.setMtName(courseCategoryByMt.getName());
+
+        return courseBaseInfoDTO;
     }
 }
