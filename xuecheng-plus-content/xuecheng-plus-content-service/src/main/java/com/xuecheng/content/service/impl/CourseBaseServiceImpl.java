@@ -9,6 +9,7 @@ import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.model.dto.AddCourseDTO;
 import com.xuecheng.content.model.dto.CourseBaseInfoDTO;
+import com.xuecheng.content.model.dto.EditCourseDTO;
 import com.xuecheng.content.model.dto.QueryCourseParamsDTO;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.model.po.CourseCategory;
@@ -68,16 +69,7 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         courseMarket.setId(courseBase.getId());
         courseMarketMapper.insertOrUpdate(courseMarket);
 
-        CourseBaseInfoDTO courseBaseInfoDTO = new CourseBaseInfoDTO();
-        BeanUtils.copyProperties(courseBase, courseBaseInfoDTO);
-        BeanUtils.copyProperties(courseMarket, courseBaseInfoDTO);
-
-        CourseCategory courseCategoryBySt = courseCategoryMapper.selectById(courseBase.getSt());
-        courseBaseInfoDTO.setStName(courseCategoryBySt.getName());
-        CourseCategory courseCategoryByMt = courseCategoryMapper.selectById(courseBase.getMt());
-        courseBaseInfoDTO.setMtName(courseCategoryByMt.getName());
-
-        return courseBaseInfoDTO;
+        return getCourseBaseInfoById(courseBase.getId());
     }
 
     @Override
@@ -87,12 +79,35 @@ public class CourseBaseServiceImpl implements CourseBaseService {
         CourseBase courseBase = courseBaseMapper.selectById(id);
         BeanUtils.copyProperties(courseBase, courseBaseInfoDTO);
         CourseMarket courseMarket = courseMarketMapper.selectById(id);
-        BeanUtils.copyProperties(courseBase, courseMarket);
+        BeanUtils.copyProperties(courseMarket, courseBaseInfoDTO);
         CourseCategory courseCategoryBySt = courseCategoryMapper.selectById(courseBase.getSt());
         courseBaseInfoDTO.setStName(courseCategoryBySt.getName());
         CourseCategory courseCategoryByMt = courseCategoryMapper.selectById(courseBase.getMt());
         courseBaseInfoDTO.setMtName(courseCategoryByMt.getName());
 
         return courseBaseInfoDTO;
+    }
+
+    @Override
+    public CourseBaseInfoDTO updateCourseBase(Long companyId, EditCourseDTO editCourseDTO) {
+        Long courseId = editCourseDTO.getId();
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (courseBase == null) {
+            throw new RuntimeException("课程不存在");
+        }
+        if (!courseBase.getCompanyId().equals(companyId)) {
+            throw new RuntimeException("不允许修改其他机构的课程");
+        }
+
+        BeanUtils.copyProperties(editCourseDTO, courseBase);
+        courseBase.setChangeDate(LocalDateTime.now()); // TODO 待实现自动填充
+        courseBaseMapper.updateById(courseBase);
+
+        CourseMarket courseMarket = new CourseMarket();
+        BeanUtils.copyProperties(editCourseDTO, courseMarket);
+        courseMarket.setId(courseId);
+        courseMarketMapper.insertOrUpdate(courseMarket);
+
+        return getCourseBaseInfoById(courseId);
     }
 }

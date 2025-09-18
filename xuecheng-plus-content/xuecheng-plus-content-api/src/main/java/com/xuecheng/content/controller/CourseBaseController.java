@@ -4,6 +4,7 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.model.dto.AddCourseDTO;
 import com.xuecheng.content.model.dto.CourseBaseInfoDTO;
+import com.xuecheng.content.model.dto.EditCourseDTO;
 import com.xuecheng.content.model.dto.QueryCourseParamsDTO;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.service.CourseBaseService;
@@ -37,5 +38,12 @@ public class CourseBaseController {
     @Operation(summary = "根据ID查询课程信息", description = "根据课程ID查询课程的基本信息和营销信息")
     public CourseBaseInfoDTO getById(@PathVariable Long id) {
         return courseBaseService.getCourseBaseInfoById(id);
+    }
+
+    @PutMapping
+    @Operation(summary = "课程修改接口", description = "修改课程信息")
+    public CourseBaseInfoDTO updateById(@RequestBody EditCourseDTO editCourseDTO) {
+        Long companyId = 1232141425L; // TODO 机构ID, 目前硬编码
+        return courseBaseService.updateCourseBase(companyId, editCourseDTO);
     }
 }
