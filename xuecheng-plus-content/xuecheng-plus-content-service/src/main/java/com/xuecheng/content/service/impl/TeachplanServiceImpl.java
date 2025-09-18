@@ -3,6 +3,7 @@ package com.xuecheng.content.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuecheng.content.mapper.TeachplanMapper;
 import com.xuecheng.content.mapper.TeachplanMediaMapper;
+import com.xuecheng.content.model.dto.EditTeachplanDTO;
 import com.xuecheng.content.model.dto.TeachplanTreeNodeDTO;
 import com.xuecheng.content.model.po.Teachplan;
 import com.xuecheng.content.model.po.TeachplanMedia;
@@ -55,5 +56,12 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
 
         return tree;
+    }
+
+    @Override
+    public void addOrUpdateTeachplan(EditTeachplanDTO editTeachplanDTO) {
+        Teachplan teachplan = new Teachplan();
+        BeanUtils.copyProperties(editTeachplanDTO, teachplan);
+        teachplanMapper.insertOrUpdate(teachplan);
     }
 }
