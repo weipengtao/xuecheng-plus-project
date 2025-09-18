@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xuecheng.content.mapper.TeachplanMapper">
-
+    <select id="selectByCourseId" resultType="com.xuecheng.content.model.po.Teachplan">
+        with recursive parent_node as (
+            select * from teachplan where course_id = #{courseId} and parentid = 0
+            union all
+            select child_node.* from teachplan child_node inner join parent_node on child_node.parentid = parent_node.id
+        )
+        select * from parent_node order by orderby;
+    </select>
 </mapper>
