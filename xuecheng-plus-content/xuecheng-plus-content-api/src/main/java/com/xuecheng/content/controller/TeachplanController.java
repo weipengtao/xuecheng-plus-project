@@ -35,4 +35,16 @@ public class TeachplanController {
     public void deleteTeachplan(@PathVariable Long id) {
         teachplanService.deleteTeachplanById(id);
     }
+
+    @PostMapping("/movedown/{id}")
+    @Operation(summary = "课程计划下移", description = "课程计划下移")
+    public void moveDown(@PathVariable Long id) {
+        teachplanService.moveDown(id);
+    }
+
+    @PostMapping("/moveup/{id}")
+    @Operation(summary = "课程计划上移", description = "课程计划上移")
+    public void moveUp(@PathVariable Long id) {
+        teachplanService.moveUp(id);
+    }
 }

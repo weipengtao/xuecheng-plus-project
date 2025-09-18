@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,5 +71,43 @@ public class TeachplanServiceImpl implements TeachplanService {
             throw new RuntimeException("Cannot delete teachplan with child nodes");
         }
         teachplanMapper.deleteById(id);
+    }
+
+    @Override
+    public void moveDown(Long id) {
+        Teachplan teachplan = teachplanMapper.selectById(id);
+
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getParentid, teachplan.getParentid())
+                .gt(Teachplan::getOrderby, teachplan.getOrderby())
+                .orderByAsc(Teachplan::getOrderby);
+        Teachplan teachplanDown = teachplanMapper.selectList(queryWrapper).getFirst();
+        if (teachplanDown == null) {
+            return;
+        }
+        int tempOrder = teachplan.getOrderby();
+        teachplan.setOrderby(teachplanDown.getOrderby());
+        teachplanDown.setOrderby(tempOrder);
+        teachplanMapper.updateById(teachplan);
+        teachplanMapper.updateById(teachplanDown);
+    }
+
+    @Override
+    public void moveUp(Long id) {
+        Teachplan teachplan = teachplanMapper.selectById(id);
+
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getParentid, teachplan.getParentid())
+                .lt(Teachplan::getOrderby, teachplan.getOrderby())
+                .orderByDesc(Teachplan::getOrderby);
+        Teachplan teachplanUp = teachplanMapper.selectList(queryWrapper).getFirst();
+        if (teachplanUp == null) {
+            return;
+        }
+        int tempOrder = teachplan.getOrderby();
+        teachplan.setOrderby(teachplanUp.getOrderby());
+        teachplanUp.setOrderby(tempOrder);
+        teachplanMapper.updateById(teachplan);
+        teachplanMapper.updateById(teachplanUp);
     }
 }
