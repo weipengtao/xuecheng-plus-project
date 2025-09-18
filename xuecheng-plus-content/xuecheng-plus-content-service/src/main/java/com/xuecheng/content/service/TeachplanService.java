@@ -9,4 +9,6 @@ public interface TeachplanService {
     List<TeachplanTreeNodeDTO> getTeachplanTreeNodesByCourseId(String courseId);
 
     void addOrUpdateTeachplan(EditTeachplanDTO editTeachplanDTO);
+
+    void deleteTeachplanById(Long id);
 }

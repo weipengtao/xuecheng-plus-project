@@ -64,4 +64,13 @@ public class TeachplanServiceImpl implements TeachplanService {
         BeanUtils.copyProperties(editTeachplanDTO, teachplan);
         teachplanMapper.insertOrUpdate(teachplan);
     }
+
+    @Override
+    public void deleteTeachplanById(Long id) {
+        Long count = teachplanMapper.selectCount(new LambdaQueryWrapper<Teachplan>().eq(Teachplan::getParentid, id));
+        if (count > 0) {
+            throw new RuntimeException("Cannot delete teachplan with child nodes");
+        }
+        teachplanMapper.deleteById(id);
+    }
 }

@@ -29,4 +29,10 @@ public class TeachplanController {
     public void addOrUpdateTeachplan(@RequestBody EditTeachplanDTO editTeachplanDTO) {
         teachplanService.addOrUpdateTeachplan(editTeachplanDTO);
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除课程计划", description = "根据课程计划ID删除对应的课程计划")
+    public void deleteTeachplan(@PathVariable Long id) {
+        teachplanService.deleteTeachplanById(id);
+    }
 }
