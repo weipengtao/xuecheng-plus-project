@@ -46,4 +46,10 @@ public class CourseBaseController {
         Long companyId = 1232141425L; // TODO 机构ID, 目前硬编码
         return courseBaseService.updateCourseBase(companyId, editCourseDTO);
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "课程删除接口", description = "根据ID删除课程信息")
+    public void delete(@PathVariable Long id) {
+        courseBaseService.deleteById(id);
+    }
 }

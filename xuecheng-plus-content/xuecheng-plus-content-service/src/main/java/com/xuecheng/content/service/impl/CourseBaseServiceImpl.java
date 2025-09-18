@@ -110,4 +110,9 @@ public class CourseBaseServiceImpl implements CourseBaseService {
 
         return getCourseBaseInfoById(courseId);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        courseBaseMapper.deleteById(id);
+    }
 }
