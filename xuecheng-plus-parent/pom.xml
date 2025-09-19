@@ -11,6 +11,8 @@
 
     <modules>
         <module>../xuecheng-plus-base</module>
+        <module>../xuecheng-plus-gateway</module>
+        <module>../xuecheng-plus-system</module>
         <module>../xuecheng-plus-content</module>
     </modules>
 
