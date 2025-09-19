@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>3.5.5</spring-boot.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.3.3</spring-cloud-alibaba.version>
+        <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
         <org.projectlombok.version>1.18.40</org.projectlombok.version>
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <velocity-engine-core.version>2.3</velocity-engine-core.version>
