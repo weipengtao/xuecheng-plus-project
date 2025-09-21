@@ -11,6 +11,7 @@
 
     <modules>
         <module>../xuecheng-plus-base</module>
+        <module>../xuecheng-plus-utils</module>
         <module>../xuecheng-plus-gateway</module>
         <module>../xuecheng-plus-system</module>
         <module>../xuecheng-plus-content</module>
@@ -29,6 +30,7 @@
         <velocity-engine-core.version>2.3</velocity-engine-core.version>
         <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
         <springdoc-openapi.version>2.8.13</springdoc-openapi.version>
+        <minio.version>8.5.17</minio.version>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +122,12 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc-openapi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

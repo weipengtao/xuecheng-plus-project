@@ -1,0 +1,26 @@
+package com.xuecheng.media.controller;
+
+import com.xuecheng.media.model.dto.UploadFileResultDTO;
+import com.xuecheng.media.service.MediaFilesService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("/media")
+@RequiredArgsConstructor
+@Tag(name = "媒资管理接口", description = "实现媒资管理相关操作")
+public class MediaFilesController {
+
+    private final MediaFilesService mediaFilesService;
+
+    @PostMapping("/upload/coursefile")
+    @Operation(summary = "上传课程图片接口", description = "上传课程图片")
+    public UploadFileResultDTO uploadCourseFile(MultipartFile filedata) throws Exception {
+        return mediaFilesService.uploadCourseFile(filedata);
+    }
+}
