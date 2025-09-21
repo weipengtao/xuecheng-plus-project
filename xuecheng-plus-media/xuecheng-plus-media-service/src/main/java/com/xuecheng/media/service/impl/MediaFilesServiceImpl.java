@@ -1,6 +1,11 @@
 package com.xuecheng.media.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xuecheng.base.model.PageParams;
+import com.xuecheng.base.model.PageResult;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
 import com.xuecheng.media.property.MinioProperty;
@@ -30,6 +35,26 @@ public class MediaFilesServiceImpl implements MediaFilesService {
 
     private final MinioClient minioClient;
     private final MinioProperty minioProperty;
+
+    @Override
+    public PageResult<MediaFiles> pageQuery(PageParams pageParams, MediaFilesPageQueryRequestDTO pageQueryRequestDTO) {
+        Page<MediaFiles> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
+
+        String filename = pageQueryRequestDTO.getFilename();
+        String fileType = pageQueryRequestDTO.getFileType();
+        LambdaQueryWrapper<MediaFiles> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(filename != null, MediaFiles::getFilename, filename);
+        queryWrapper.like(fileType != null, MediaFiles::getFileType, fileType);
+
+        Page<MediaFiles> result = mediaFilesMapper.selectPage(page, queryWrapper);
+
+        return PageResult.<MediaFiles>builder()
+                .items(result.getRecords())
+                .page(pageParams.getPageNo())
+                .pageSize(pageParams.getPageSize())
+                .counts(result.getTotal())
+                .build();
+    }
 
     @Override
     public UploadFileResultDTO uploadCourseFile(MultipartFile file) throws Exception {

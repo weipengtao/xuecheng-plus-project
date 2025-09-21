@@ -1,11 +1,16 @@
 package com.xuecheng.media.controller;
 
+import com.xuecheng.base.model.PageParams;
+import com.xuecheng.base.model.PageResult;
+import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
+import com.xuecheng.media.model.po.MediaFiles;
 import com.xuecheng.media.service.MediaFilesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class MediaFilesController {
 
     private final MediaFilesService mediaFilesService;
+
+    @PostMapping("/files")
+    @Operation(summary = "课程查询接口", description = "分页查询课程信息")
+    public PageResult<MediaFiles> list(PageParams pageParams, @RequestBody(required = false) MediaFilesPageQueryRequestDTO pageQueryRequestDTO) {
+        return mediaFilesService.pageQuery(pageParams, pageQueryRequestDTO);
+    }
 
     @PostMapping("/upload/coursefile")
     @Operation(summary = "上传课程图片接口", description = "上传课程图片")
