@@ -2,6 +2,7 @@ package com.xuecheng.media.controller;
 
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
+import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
@@ -33,5 +34,17 @@ public class MediaFilesController {
     @Operation(summary = "上传课程图片接口", description = "上传课程图片")
     public UploadFileResultDTO uploadCourseFile(MultipartFile filedata) throws Exception {
         return mediaFilesService.uploadCourseFile(filedata);
+    }
+
+    @PostMapping("/upload/checkfile")
+    @Operation(summary = "检查文件是否上传接口", description = "检查文件是否上传")
+    public RestResponse<Boolean> checkFile(String fileMd5) {
+        return RestResponse.success(mediaFilesService.checkFile(fileMd5));
+    }
+
+    @PostMapping("/upload/checkchunk")
+    @Operation(summary = "检查文件分块是否上传接口", description = "检查文件分块是否上传")
+    public RestResponse<Boolean> checkChunk(String fileMd5, Integer chunk) {
+        return RestResponse.success(mediaFilesService.checkChunk(fileMd5, chunk));
     }
 }

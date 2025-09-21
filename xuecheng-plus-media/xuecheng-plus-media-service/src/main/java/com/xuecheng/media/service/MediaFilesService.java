@@ -13,4 +13,8 @@ public interface MediaFilesService {
     PageResult<MediaFiles> pageQuery(PageParams pageParams, MediaFilesPageQueryRequestDTO pageQueryRequestDTO);
 
     UploadFileResultDTO uploadCourseFile(MultipartFile file) throws Exception;
+
+    Boolean checkFile(String md5);
+
+    Boolean checkChunk(String md5, Integer chunk);
 }

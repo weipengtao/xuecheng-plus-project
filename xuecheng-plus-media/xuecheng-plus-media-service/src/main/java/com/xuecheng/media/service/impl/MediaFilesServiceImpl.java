@@ -11,24 +11,28 @@ import com.xuecheng.media.model.po.MediaFiles;
 import com.xuecheng.media.property.MinioProperty;
 import com.xuecheng.media.service.MediaFilesService;
 import com.xuecheng.utils.Md5Util;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
+import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MediaFilesServiceImpl implements MediaFilesService {
 
     private final MediaFilesMapper mediaFilesMapper;
@@ -106,5 +110,49 @@ public class MediaFilesServiceImpl implements MediaFilesService {
         BeanUtils.copyProperties(mediaFile, uploadFileResultDTO);
 
         return uploadFileResultDTO;
+    }
+
+    @Override
+    public Boolean checkFile(String md5) {
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(md5);
+        if (mediaFiles == null) {
+            return false;
+        }
+
+        String bucket = mediaFiles.getBucket();
+        String objectName = mediaFiles.getFilePath();
+
+        return isExistMinio(bucket, objectName);
+    }
+
+    @Override
+    public Boolean checkChunk(String md5, Integer chunk) {
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(md5);
+        if (mediaFiles == null) {
+            return false;
+        }
+
+        String bucket = mediaFiles.getBucket();
+        String objectName =  md5.charAt(0) + "/" + md5.charAt(1) + "/" + md5 + "/" + chunk;
+
+        return isExistMinio(bucket, objectName);
+    }
+
+    @NotNull
+    private Boolean isExistMinio(String bucket, String objectName) {
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder()
+                .bucket(bucket)
+                .object(objectName)
+                .build();
+        try {
+            GetObjectResponse object = minioClient.getObject(getObjectArgs);
+            if (object == null) {
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("向 minio 查询失败, {}", e.getMessage());
+            throw new RuntimeException("向 minio 查询失败");
+        }
+        return true;
     }
 }
