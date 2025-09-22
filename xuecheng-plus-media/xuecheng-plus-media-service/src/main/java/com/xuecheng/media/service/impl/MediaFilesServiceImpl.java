@@ -12,7 +12,7 @@ import com.xuecheng.media.property.MinioProperty;
 import com.xuecheng.media.service.MediaFilesService;
 import com.xuecheng.utils.Md5Util;
 import io.minio.*;
-import io.minio.errors.*;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -21,14 +21,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -134,9 +135,7 @@ public class MediaFilesServiceImpl implements MediaFilesService {
     }
 
     @Override
-    public Boolean uploadChunk(MultipartFile file, String md5, Integer chunk) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-
-
+    public Boolean uploadChunk(MultipartFile file, String md5, Integer chunk) throws Exception {
         String bucket = minioProperty.getBucket().getVideoFiles();
         boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!found) {
@@ -144,7 +143,7 @@ public class MediaFilesServiceImpl implements MediaFilesService {
         }
 
         String filename = file.getOriginalFilename();
-        String objectName = md5.charAt(0) + "/" + md5.charAt(1) + "/" + md5 + "/" + chunk;
+        String objectName = md5.charAt(0) + "/" + md5.charAt(1) + "/" + md5 + "/chunk/" + chunk;
 
         String contentType = file.getContentType() != null ? file.getContentType() : Files.probeContentType(Path.of(filename));
 
@@ -156,6 +155,77 @@ public class MediaFilesServiceImpl implements MediaFilesService {
                         .contentType(contentType)
                         .build()
         );
+
+        return true;
+    }
+
+    @Override
+    public Boolean mergeChunks(String filename, String fileMd5, Integer chunkTotal) throws Exception {
+        String bucket = minioProperty.getBucket().getVideoFiles();
+        String dir = fileMd5.charAt(0) + "/" + fileMd5.charAt(1) + "/" + fileMd5 + "/";
+
+        List<ComposeSource> composeSources = Stream.iterate(0, i -> i + 1)
+                .limit(chunkTotal)
+                .map(i -> ComposeSource.builder()
+                        .bucket(bucket)
+                        .object(dir + "chunk/" + i)
+                        .build())
+                .toList();
+
+        String objectName = dir + fileMd5 + filename.substring(filename.lastIndexOf("."));
+        minioClient.composeObject(
+                ComposeObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .sources(composeSources)
+                        .build());
+
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder()
+                .bucket(bucket)
+                .object(objectName)
+                .build();
+        String mergedMd5 = Md5Util.getFileMd5(minioClient.getObject(getObjectArgs));
+        if (!Objects.equals(mergedMd5, fileMd5)) {
+            log.debug("合并后的md5: {}, 与原本不符: {}", mergedMd5, fileMd5);
+            RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(objectName)
+                    .build();
+            minioClient.removeObject(removeObjectArgs);
+            return false;
+        }
+
+        List<RemoveObjectArgs> removeObjectArgs = Stream.iterate(0, i -> i + 1)
+                .limit(chunkTotal)
+                .map(i -> RemoveObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(dir + "chunk/" + i)
+                        .build())
+                .toList();
+        for (RemoveObjectArgs i : removeObjectArgs) {
+            minioClient.removeObject(i);
+        }
+
+        StatObjectResponse stat = minioClient.statObject(
+                StatObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .build()
+        );
+
+        MediaFiles mediaFile = new MediaFiles();
+        mediaFile.setId(fileMd5);
+        mediaFile.setFilename(filename);
+        mediaFile.setFileType("001002");
+        mediaFile.setTags("课程视频");
+        mediaFile.setBucket(bucket);
+        mediaFile.setFilePath(objectName);
+        mediaFile.setFileId(fileMd5);
+        mediaFile.setUrl("/" + bucket + "/" + objectName);
+        mediaFile.setCreateDate(LocalDateTime.now());
+        mediaFile.setAuditStatus("002003");
+        mediaFile.setFileSize(stat.size());
+        mediaFilesMapper.insert(mediaFile);
 
         return true;
     }

@@ -7,7 +7,6 @@ import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
 import com.xuecheng.media.service.MediaFilesService;
-import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/media")
@@ -55,7 +50,17 @@ public class MediaFilesController {
 
     @PostMapping("/upload/uploadchunk")
     @Operation(summary = "上传文件块接口", description = "上传文件块")
-    public RestResponse<Boolean> uploadChunk(MultipartFile file, String fileMd5, Integer chunk) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public RestResponse<Boolean> uploadChunk(MultipartFile file, String fileMd5, Integer chunk) throws Exception {
         return RestResponse.success(mediaFilesService.uploadChunk(file, fileMd5, chunk));
+    }
+
+    @PostMapping("/upload/mergechunks")
+    @Operation(summary = "合并分块接口", description = "合并分块")
+    public RestResponse<Boolean> mergeChunks(String fileName, String fileMd5, Integer chunkTotal) {
+        try {
+            return RestResponse.success(mediaFilesService.mergeChunks(fileName, fileMd5, chunkTotal));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
