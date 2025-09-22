@@ -7,6 +7,7 @@ import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
 import com.xuecheng.media.service.MediaFilesService;
+import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/media")
@@ -46,5 +51,11 @@ public class MediaFilesController {
     @Operation(summary = "检查文件分块是否上传接口", description = "检查文件分块是否上传")
     public RestResponse<Boolean> checkChunk(String fileMd5, Integer chunk) {
         return RestResponse.success(mediaFilesService.checkChunk(fileMd5, chunk));
+    }
+
+    @PostMapping("/upload/uploadchunk")
+    @Operation(summary = "上传文件块接口", description = "上传文件块")
+    public RestResponse<Boolean> uploadChunk(MultipartFile file, String fileMd5, Integer chunk) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return RestResponse.success(mediaFilesService.uploadChunk(file, fileMd5, chunk));
     }
 }

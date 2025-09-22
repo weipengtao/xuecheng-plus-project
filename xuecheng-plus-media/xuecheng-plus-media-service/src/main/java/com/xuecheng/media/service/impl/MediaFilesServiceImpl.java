@@ -119,7 +119,7 @@ public class MediaFilesServiceImpl implements MediaFilesService {
             return false;
         }
 
-        String bucket = mediaFiles.getBucket();
+        String bucket = minioProperty.getBucket().getVideoFiles();
         String objectName = mediaFiles.getFilePath();
 
         return isExistMinio(bucket, objectName);
@@ -127,32 +127,66 @@ public class MediaFilesServiceImpl implements MediaFilesService {
 
     @Override
     public Boolean checkChunk(String md5, Integer chunk) {
-        MediaFiles mediaFiles = mediaFilesMapper.selectById(md5);
-        if (mediaFiles == null) {
-            return false;
-        }
-
-        String bucket = mediaFiles.getBucket();
-        String objectName =  md5.charAt(0) + "/" + md5.charAt(1) + "/" + md5 + "/" + chunk;
+        String bucket = minioProperty.getBucket().getVideoFiles();
+        String objectName = md5.charAt(0) + "/" + md5.charAt(1) + "/" + md5 + "/" + chunk;
 
         return isExistMinio(bucket, objectName);
     }
 
+    @Override
+    public Boolean uploadChunk(MultipartFile file, String md5, Integer chunk) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+
+
+        String bucket = minioProperty.getBucket().getVideoFiles();
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!found) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+        }
+
+        String filename = file.getOriginalFilename();
+        String objectName = md5.charAt(0) + "/" + md5.charAt(1) + "/" + md5 + "/" + chunk;
+
+        String contentType = file.getContentType() != null ? file.getContentType() : Files.probeContentType(Path.of(filename));
+
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .contentType(contentType)
+                        .build()
+        );
+
+        return true;
+    }
+
     @NotNull
     private Boolean isExistMinio(String bucket, String objectName) {
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder()
-                .bucket(bucket)
-                .object(objectName)
-                .build();
         try {
-            GetObjectResponse object = minioClient.getObject(getObjectArgs);
-            if (object == null) {
-                return false;
+            // 使用statObject方法只获取对象元数据，而不下载内容
+            minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectName)
+                            .build()
+            );
+
+            // 如果statObject成功执行，说明对象存在
+            return true;
+        } catch (ErrorResponseException e) {
+            // 检查是否是"对象不存在"的错误
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
+                return false; // 对象不存在
             }
+
+            // 其他MinIO错误
+            log.error("MinIO查询失败: bucket={}, object={}, errorCode={}",
+                    bucket, objectName, e.errorResponse().code(), e);
+            throw new RuntimeException("MinIO查询失败: " + e.errorResponse().message(), e);
         } catch (Exception e) {
-            log.error("向 minio 查询失败, {}", e.getMessage());
-            throw new RuntimeException("向 minio 查询失败");
+            // 其他异常（网络问题、权限问题等）
+            log.error("MinIO查询失败: bucket={}, object={}", bucket, objectName, e);
+            throw new RuntimeException("MinIO查询失败", e);
         }
-        return true;
     }
 }

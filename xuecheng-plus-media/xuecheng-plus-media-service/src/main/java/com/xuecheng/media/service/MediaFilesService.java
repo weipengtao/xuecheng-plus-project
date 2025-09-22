@@ -5,9 +5,12 @@ import com.xuecheng.base.model.PageResult;
 import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
+import io.minio.errors.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public interface MediaFilesService {
     PageResult<MediaFiles> pageQuery(PageParams pageParams, MediaFilesPageQueryRequestDTO pageQueryRequestDTO);
@@ -17,4 +20,6 @@ public interface MediaFilesService {
     Boolean checkFile(String md5);
 
     Boolean checkChunk(String md5, Integer chunk);
+
+    Boolean uploadChunk(MultipartFile file, String md5, Integer chunk) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 }
