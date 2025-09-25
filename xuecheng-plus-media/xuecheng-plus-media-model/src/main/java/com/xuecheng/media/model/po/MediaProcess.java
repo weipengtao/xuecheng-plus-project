@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author weipengtao
- * @since 2025-09-20
+ * @since 2025-09-25
  */
 @Data
 @Builder
@@ -77,4 +77,9 @@ public class MediaProcess implements Serializable {
      * 失败原因
      */
     private String errormsg;
+
+    /**
+     * 失败次数
+     */
+    private Integer failCount;
 }
