@@ -1,8 +1,10 @@
 package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xuecheng.content.mapper.TeachplanMapper;
 import com.xuecheng.content.mapper.TeachplanMediaMapper;
+import com.xuecheng.content.model.dto.AssociateMediaDTO;
 import com.xuecheng.content.model.dto.EditTeachplanDTO;
 import com.xuecheng.content.model.dto.TeachplanTreeNodeDTO;
 import com.xuecheng.content.model.po.Teachplan;
@@ -11,7 +13,9 @@ import com.xuecheng.content.service.TeachplanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TeachplanServiceImpl implements TeachplanService {
+public class TeachplanServiceImpl extends ServiceImpl<TeachplanMapper, Teachplan> implements TeachplanService {
 
     private final TeachplanMapper teachplanMapper;
     private final TeachplanMediaMapper teachplanMediaMapper;
@@ -65,15 +69,18 @@ public class TeachplanServiceImpl implements TeachplanService {
     }
 
     @Override
+    @Transactional
     public void deleteTeachplanById(Long id) {
         Long count = teachplanMapper.selectCount(new LambdaQueryWrapper<Teachplan>().eq(Teachplan::getParentid, id));
         if (count > 0) {
             throw new RuntimeException("Cannot delete teachplan with child nodes");
         }
         teachplanMapper.deleteById(id);
+        teachplanMediaMapper.deleteByTeachplanId(id);
     }
 
     @Override
+    @Transactional
     public void moveDown(Long id) {
         Teachplan teachplan = teachplanMapper.selectById(id);
 
@@ -93,6 +100,7 @@ public class TeachplanServiceImpl implements TeachplanService {
     }
 
     @Override
+    @Transactional
     public void moveUp(Long id) {
         Teachplan teachplan = teachplanMapper.selectById(id);
 
@@ -109,5 +117,37 @@ public class TeachplanServiceImpl implements TeachplanService {
         teachplanUp.setOrderby(tempOrder);
         teachplanMapper.updateById(teachplan);
         teachplanMapper.updateById(teachplanUp);
+    }
+
+    @Override
+    @Transactional
+    public TeachplanMedia associateMedia(AssociateMediaDTO associateMediaDTO) {
+        Long teachplanId = associateMediaDTO.getTeachplanId();
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+        if (teachplan == null) {
+            throw new RuntimeException("未找到课程计划, ID: " + teachplanId);
+        }
+        if (teachplan.getGrade() != 2) {
+            throw new RuntimeException("课程计划不是二级, 不能绑定媒资");
+        }
+
+        teachplanMediaMapper.deleteByTeachplanId(teachplanId);
+
+        TeachplanMedia teachplanMedia = new TeachplanMedia();
+        teachplanMedia.setCourseId(teachplan.getCourseId());
+        teachplanMedia.setTeachplanId(teachplanId);
+        teachplanMedia.setMediaFilename(associateMediaDTO.getFileName());
+        teachplanMedia.setMediaId(associateMediaDTO.getMediaId());
+        teachplanMedia.setCreateDate(LocalDateTime.now());
+        teachplanMediaMapper.insert(teachplanMedia);
+        return teachplanMedia;
+    }
+
+    @Override
+    public void unassociateMedia(Long teachPlanId, String mediaId) {
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeachplanMedia::getTeachplanId, teachPlanId)
+                .eq(TeachplanMedia::getMediaId, mediaId);
+        teachplanMediaMapper.delete(queryWrapper);
     }
 }

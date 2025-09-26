@@ -1,7 +1,9 @@
 package com.xuecheng.content.controller;
 
+import com.xuecheng.content.model.dto.AssociateMediaDTO;
 import com.xuecheng.content.model.dto.EditTeachplanDTO;
 import com.xuecheng.content.model.dto.TeachplanTreeNodeDTO;
+import com.xuecheng.content.model.po.TeachplanMedia;
 import com.xuecheng.content.service.TeachplanService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,5 +48,17 @@ public class TeachplanController {
     @Operation(summary = "课程计划上移", description = "课程计划上移")
     public void moveUp(@PathVariable Long id) {
         teachplanService.moveUp(id);
+    }
+
+    @PostMapping("/association/media")
+    @Operation(summary = "课程计划绑定媒资", description = "课程计划绑定媒资")
+    public TeachplanMedia associateMedia(@RequestBody AssociateMediaDTO associateMediaDTO) {
+        return teachplanService.associateMedia(associateMediaDTO);
+    }
+
+    @DeleteMapping("/association/media/{teachPlanId}/{mediaId}")
+    @Operation(summary = "课程计划解绑媒资", description = "课程计划解绑媒资")
+    public void unassociateMedia(@PathVariable Long teachPlanId, @PathVariable String mediaId) {
+        teachplanService.unassociateMedia(teachPlanId, mediaId);
     }
 }
