@@ -181,4 +181,33 @@ public class MediaFilesServiceImpl implements MediaFilesService {
 
         return true;
     }
+
+    @Override
+    @Transactional
+    public Boolean deleteById(String id) {
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(id);
+        if (mediaFiles == null) {
+            log.warn("视频不存在，视频 ID: {}", id);
+            return false;
+        }
+
+        mediaFilesMapper.deleteById(id);
+
+        String bucket = mediaFiles.getBucket();
+        String objectName = mediaFiles.getFilePath();
+        if (bucket == null || objectName == null) {
+            return true;
+        }
+
+        // 删除 minio 中存储的视频
+        try {
+            minioService.removeObject(bucket, objectName);
+        } catch (Exception e) {
+            log.error("删除 MinIO 中存储的视频失败, 视频 ID: {}, bucket: {}, object: {}", id, bucket, objectName, e);
+        }
+
+        // TODO 删除 content 服务中的绑定关系
+
+        return true;
+    }
 }

@@ -19,4 +19,6 @@ public interface MediaFilesService {
     Boolean uploadChunk(MultipartFile file, String md5, Integer chunk) throws Exception;
 
     Boolean mergeChunks(String filename, String fileMd5, Integer chunkTotal) throws Exception;
+
+    Boolean deleteById(String id);
 }

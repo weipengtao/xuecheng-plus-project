@@ -10,10 +10,7 @@ import com.xuecheng.media.service.MediaFilesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -62,5 +59,10 @@ public class MediaFilesController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public RestResponse<Boolean> delete(@PathVariable String id) {
+        return RestResponse.success(mediaFilesService.deleteById(id));
     }
 }

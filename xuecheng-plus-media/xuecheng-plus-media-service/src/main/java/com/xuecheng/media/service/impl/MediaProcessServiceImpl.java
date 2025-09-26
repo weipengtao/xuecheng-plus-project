@@ -75,7 +75,8 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
             return;
         }
 
-        String mp4ObjectName = mediaProcess.getFilePath().substring(0, mediaProcess.getFilePath().lastIndexOf(".")) + ".mp4";
+        String originObjectName = mediaProcess.getFilePath();
+        String mp4ObjectName = originObjectName.substring(0, mediaProcess.getFilePath().lastIndexOf(".")) + ".mp4";
         try {
             minioService.uploadFile(mediaProcess.getBucket(), mp4ObjectName, mp4File);
         } catch (Exception e) {
@@ -90,16 +91,23 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
         }
         String url = "/" + mediaProcess.getBucket() + "/" + mp4ObjectName;
         mediaFiles.setUrl(url);
+        mediaFiles.setFilePath(mp4ObjectName);
         mediaFilesMapper.updateById(mediaFiles);
 
         MediaProcessHistory mediaProcessHistory = new MediaProcessHistory();
         BeanUtils.copyProperties(mediaProcess, mediaProcessHistory);
         mediaProcessHistory.setId(null);
         mediaProcessHistory.setUrl(url);
+        mediaProcessHistory.setFilePath(mp4ObjectName);
         mediaProcessHistory.setFinishDate(LocalDateTime.now());
         mediaProcessHistory.setStatus("2");
         mediaProcessHistoryMapper.insert(mediaProcessHistory);
         this.removeById(mediaProcess.getId());
+        try {
+            minioService.removeObject(mediaProcess.getBucket(), originObjectName);
+        } catch (Exception ignored) {
+            // 处理已完成, 删除不了 minio 的原始文件不影响业务
+        }
     }
 
     /**
