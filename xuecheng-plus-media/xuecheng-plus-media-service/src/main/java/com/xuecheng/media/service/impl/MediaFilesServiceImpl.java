@@ -90,7 +90,7 @@ public class MediaFilesServiceImpl implements MediaFilesService {
         mediaFile.setFileId(md5);
         mediaFile.setUrl("/" + bucket + "/" + objectName);
         mediaFile.setCreateDate(LocalDateTime.now());
-        mediaFile.setAuditStatus("002003");
+        mediaFile.setAuditStatus("002002");
         mediaFile.setFileSize(file.getSize());
         mediaFilesMapper.insert(mediaFile);
 
