@@ -57,7 +57,7 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
         try {
             originFile = minioService.downloadTempFile(mediaProcess.getBucket(), mediaProcess.getFilePath());
         } catch (Exception e) {
-            log.error("下载源文件失败, 任务ID: {}, 错误信息: {}", mediaProcess.getId(), e.getMessage());
+            this.markTaskFailed(mediaProcess.getId(), "下载源文件失败", e);
             throw new RuntimeException(e);
         }
 
@@ -65,18 +65,13 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
         try {
             mp4File = File.createTempFile(mediaProcess.getFileId(), ".mp4");
         } catch (IOException e) {
-            log.error("创建临时文件失败, 任务ID: {}, 错误信息: {}", mediaProcess.getId(), e.getMessage());
+            this.markTaskFailed(mediaProcess.getId(), "创建临时文件失败", e);
             throw new RuntimeException(e);
         }
 
         VideoTranscoderUtil.TranscodeResult transcodeResult = VideoTranscoderUtil.transcode(originFile, mp4File);
         if (!transcodeResult.isSuccess()) {
-            log.error("视频转码失败, 任务ID: {}, 错误信息: {}", mediaProcess.getId(), transcodeResult.getMessage());
-            this.lambdaUpdate()
-                    .set(MediaProcess::getStatus, "3")
-                    .setSql("fail_count = fail_count + 1")
-                    .eq(MediaProcess::getId, mediaProcess.getId())
-                    .update();
+            this.markTaskFailed(mediaProcess.getId(), "视频转码失败: " + transcodeResult.getMessage());
             return;
         }
 
@@ -84,23 +79,13 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
         try {
             minioService.uploadFile(mediaProcess.getBucket(), mp4ObjectName, mp4File);
         } catch (Exception e) {
-            log.error("上传转码后文件失败, 任务ID: {}, 错误信息: {}", mediaProcess.getId(), e.getMessage());
-            this.lambdaUpdate()
-                    .set(MediaProcess::getStatus, "3")
-                    .setSql("fail_count = fail_count + 1")
-                    .eq(MediaProcess::getId, mediaProcess.getId())
-                    .update();
+            this.markTaskFailed(mediaProcess.getId(), "上传转码后文件失败", e);
             throw new RuntimeException(e);
         }
 
         MediaFiles mediaFiles = mediaFilesMapper.selectById(mediaProcess.getFileId());
         if (mediaFiles == null) {
-            log.error("找不到对应的MediaFiles记录, 任务ID: {}, 文件ID: {}", mediaProcess.getId(), mediaProcess.getFileId());
-            this.lambdaUpdate()
-                    .set(MediaProcess::getStatus, "3")
-                    .setSql("fail_count = fail_count + 1")
-                    .eq(MediaProcess::getId, mediaProcess.getId())
-                    .update();
+            this.markTaskFailed(mediaProcess.getId(), "找不到对应的MediaFiles记录");
             return;
         }
         String url = "/" + mediaProcess.getBucket() + "/" + mp4ObjectName;
@@ -115,5 +100,30 @@ public class MediaProcessServiceImpl extends ServiceImpl<MediaProcessMapper, Med
         mediaProcessHistory.setStatus("2");
         mediaProcessHistoryMapper.insert(mediaProcessHistory);
         this.removeById(mediaProcess.getId());
+    }
+
+    /**
+     * 统一处理任务失败
+     */
+    private void markTaskFailed(Long taskId, String reason) {
+        markTaskFailed(taskId, reason, null);
+    }
+
+    private void markTaskFailed(Long taskId, String reason, Exception e) {
+        if (e != null) {
+            log.error("{}，任务ID: {}", reason, taskId, e);
+        } else {
+            log.error("{}，任务ID: {}", reason, taskId);
+        }
+        try {
+            this.lambdaUpdate()
+                    .set(MediaProcess::getStatus, "3")
+                    .setSql("fail_count = fail_count + 1")
+                    .set(MediaProcess::getErrormsg, reason)
+                    .eq(MediaProcess::getId, taskId)
+                    .update();
+        } catch (Exception ex) {
+            log.error("标记任务失败异常, 任务ID: {}", taskId, ex);
+        }
     }
 }
