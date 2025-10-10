@@ -29,7 +29,7 @@ public class TeachplanServiceImpl extends ServiceImpl<TeachplanMapper, Teachplan
     private final TeachplanMediaMapper teachplanMediaMapper;
 
     @Override
-    public List<TeachplanTreeNodeDTO> getTeachplanTreeNodesByCourseId(String courseId) {
+    public List<TeachplanTreeNodeDTO> getTeachplanTreeNodesByCourseId(Long courseId) {
         List<Teachplan> teachplans = teachplanMapper.selectByCourseId(courseId);
 
         List<TeachplanTreeNodeDTO> treeNodeDTOS = teachplans.stream().map(teachplan -> {

@@ -10,7 +10,7 @@ import com.xuecheng.content.model.po.TeachplanMedia;
 import java.util.List;
 
 public interface TeachplanService extends IService<Teachplan> {
-    List<TeachplanTreeNodeDTO> getTeachplanTreeNodesByCourseId(String courseId);
+    List<TeachplanTreeNodeDTO> getTeachplanTreeNodesByCourseId(Long courseId);
 
     void addOrUpdateTeachplan(EditTeachplanDTO editTeachplanDTO);
 

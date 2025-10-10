@@ -22,7 +22,7 @@ public class TeachplanController {
 
     @GetMapping("/{courseId}/tree-nodes")
     @Operation(summary = "获取课程计划树形结构", description = "根据课程ID获取对应的课程计划树形结构")
-    public List<TeachplanTreeNodeDTO> getTeachplanTreeNodes(@PathVariable String courseId) {
+    public List<TeachplanTreeNodeDTO> getTeachplanTreeNodes(@PathVariable Long courseId) {
         return teachplanService.getTeachplanTreeNodesByCourseId(courseId);
     }
 
