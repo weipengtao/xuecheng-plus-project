@@ -4,18 +4,17 @@ import com.alibaba.fastjson2.JSON;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.mapper.CoursePublishMapper;
 import com.xuecheng.content.mapper.CoursePublishPreMapper;
+import com.xuecheng.content.mapper.MqMessageMapper;
 import com.xuecheng.content.model.dto.CourseBaseInfoDTO;
 import com.xuecheng.content.model.dto.CoursePreviewDTO;
 import com.xuecheng.content.model.dto.TeachplanTreeNodeDTO;
-import com.xuecheng.content.model.po.CourseBase;
-import com.xuecheng.content.model.po.CourseMarket;
-import com.xuecheng.content.model.po.CoursePublish;
-import com.xuecheng.content.model.po.CoursePublishPre;
+import com.xuecheng.content.model.po.*;
 import com.xuecheng.content.service.CourseBaseService;
 import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
 import com.xuecheng.system.model.enums.CourseAuditStatus;
 import com.xuecheng.system.model.enums.CoursePublishStatus;
+import com.xuecheng.system.model.enums.MessageType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -35,6 +34,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     private final CourseMarketMapper courseMarketMapper;
     private final CoursePublishPreMapper coursePublishPreMapper;
     private final CoursePublishMapper coursePublishMapper;
+    private final MqMessageMapper mqMessageMapper;
 
     @Override
     public CoursePreviewDTO getCoursePreview(Long courseId) {
@@ -107,6 +107,22 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         courseBase.setStatus(CoursePublishStatus.PUBLISHED.getCode());
         courseBaseService.updateById(courseBase);
 
+        MqMessage mqMessage = MqMessage.builder()
+                .messageType(MessageType.COURSE_PUBLISH.getCode())
+                .businessKey1(courseId.toString())
+                .build();
+        mqMessageMapper.insert(mqMessage);
+
         coursePublishPreMapper.deleteById(courseId);
+    }
+
+    @Override
+    public void processCoursePublishTask(MqMessage mqMessage) {
+        Long courseId = Long.valueOf(mqMessage.getBusinessKey1());
+        // TODO 生成静态化页面并上传至文件系统
+
+        // TODO 课程索引
+
+        // TODO 课程缓存
     }
 }
