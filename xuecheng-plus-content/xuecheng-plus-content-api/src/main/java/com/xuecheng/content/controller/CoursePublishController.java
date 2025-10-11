@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -20,7 +22,14 @@ public class CoursePublishController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("course_template");
         modelAndView.addObject("model", coursePreviewDTO);
-        modelAndView.addObject("host", "localhost:80");
         return modelAndView;
+    }
+
+    @ResponseBody
+    @PostMapping("/courseaudit/commit/{courseId}")
+    public void commitAudit(@PathVariable("courseId") Long courseId) {
+        // TODO 获取 companyId
+        Long companyId = 1232141425L;
+        coursePublishService.commitAudit(companyId, courseId);
     }
 }
