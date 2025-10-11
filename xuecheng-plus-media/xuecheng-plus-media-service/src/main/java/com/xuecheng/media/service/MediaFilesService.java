@@ -1,5 +1,6 @@
 package com.xuecheng.media.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
@@ -7,7 +8,7 @@ import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface MediaFilesService {
+public interface MediaFilesService extends IService<MediaFiles> {
     PageResult<MediaFiles> pageQuery(PageParams pageParams, MediaFilesPageQueryRequestDTO pageQueryRequestDTO);
 
     UploadFileResultDTO uploadCourseFile(MultipartFile file) throws Exception;
