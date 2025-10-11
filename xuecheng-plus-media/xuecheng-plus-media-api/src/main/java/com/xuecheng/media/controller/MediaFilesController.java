@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/media")
 @RequiredArgsConstructor
 @Tag(name = "媒资管理接口", description = "实现媒资管理相关操作")
 public class MediaFilesController {

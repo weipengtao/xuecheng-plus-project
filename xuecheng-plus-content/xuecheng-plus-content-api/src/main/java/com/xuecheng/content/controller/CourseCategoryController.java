@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/content/course-category")
+@RequestMapping("/course-category")
 @RequiredArgsConstructor
 @Tag(name = "课程分类信息接口", description = "课程分类信息相关操作")
 public class CourseCategoryController {

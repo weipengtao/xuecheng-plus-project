@@ -14,7 +14,7 @@ public class CoursePublishController {
 
     private final CoursePublishService coursePublishService;
 
-    @GetMapping("/content/coursepreview/{courseId}")
+    @GetMapping("/coursepreview/{courseId}")
     public ModelAndView preview(@PathVariable("courseId") Long courseId) {
         CoursePreviewDTO coursePreviewDTO = coursePublishService.getCoursePreview(courseId);
         ModelAndView modelAndView = new ModelAndView();

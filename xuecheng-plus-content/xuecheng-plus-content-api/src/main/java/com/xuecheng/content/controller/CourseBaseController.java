@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/content/course")
+@RequestMapping("/course")
 @RequiredArgsConstructor
 @Tag(name = "课程基本信息管理接口", description = "课程基本信息相关操作")
 public class CourseBaseController {

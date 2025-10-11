@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/system/dictionary")
+@RequestMapping("/dictionary")
 @Tag(name = "数据字典接口", description = "数据字典相关操作")
 public class DictionaryController {
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/content/courseTeacher")
+@RequestMapping("/courseTeacher")
 @RequiredArgsConstructor
 @Tag(name = "课程教师接口", description = "课程教师相关的操作接口")
 public class CourseTeacherController {
