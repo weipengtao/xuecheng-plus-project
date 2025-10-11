@@ -32,4 +32,12 @@ public class CoursePublishController {
         Long companyId = 1232141425L;
         coursePublishService.commitAudit(companyId, courseId);
     }
+
+    @ResponseBody
+    @PostMapping("/coursepublish/{courseId}")
+    public void coursePublish(@PathVariable("courseId") Long courseId) {
+        // TODO 获取 companyId
+        Long companyId = 1232141425L;
+        coursePublishService.coursePublish(companyId, courseId);
+    }
 }

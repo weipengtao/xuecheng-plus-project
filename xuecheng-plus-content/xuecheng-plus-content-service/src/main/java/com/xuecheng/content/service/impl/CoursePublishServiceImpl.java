@@ -2,22 +2,24 @@ package com.xuecheng.content.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.xuecheng.content.mapper.CourseMarketMapper;
+import com.xuecheng.content.mapper.CoursePublishMapper;
 import com.xuecheng.content.mapper.CoursePublishPreMapper;
 import com.xuecheng.content.model.dto.CourseBaseInfoDTO;
 import com.xuecheng.content.model.dto.CoursePreviewDTO;
 import com.xuecheng.content.model.dto.TeachplanTreeNodeDTO;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.model.po.CourseMarket;
+import com.xuecheng.content.model.po.CoursePublish;
 import com.xuecheng.content.model.po.CoursePublishPre;
 import com.xuecheng.content.service.CourseBaseService;
 import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
 import com.xuecheng.system.model.enums.CourseAuditStatus;
-import io.swagger.v3.core.util.Json;
+import com.xuecheng.system.model.enums.CoursePublishStatus;
 import lombok.RequiredArgsConstructor;
-import netscape.javascript.JSObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +34,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     private final CourseMarketMapper courseMarketMapper;
     private final CoursePublishPreMapper coursePublishPreMapper;
+    private final CoursePublishMapper coursePublishMapper;
 
     @Override
     public CoursePreviewDTO getCoursePreview(Long courseId) {
@@ -79,5 +82,31 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
         courseBase.setAuditStatus(CourseAuditStatus.SUBMITTED.getCode());
         courseBaseService.updateById(courseBase);
+    }
+
+    @Transactional
+    @Override
+    public void coursePublish(Long companyId, Long courseId) {
+        CoursePublishPre coursePublishPre = coursePublishPreMapper.selectById(courseId);
+        if (coursePublishPre == null) {
+            throw new IllegalArgumentException("请先提交审核");
+        }
+        if (!coursePublishPre.getCompanyId().equals(companyId)) {
+            throw new IllegalArgumentException("只能发布本机构的课程");
+        }
+        if (!Objects.equals(coursePublishPre.getStatus(), CourseAuditStatus.APPROVED.getCode())) {
+            throw new IllegalArgumentException("课程未审核通过，无法发布");
+        }
+
+        CoursePublish coursePublish = new CoursePublish();
+        BeanUtils.copyProperties(coursePublishPre, coursePublish);
+        coursePublish.setStatus(CoursePublishStatus.PUBLISHED.getCode());
+        coursePublishMapper.insertOrUpdate(coursePublish);
+
+        CourseBase courseBase = courseBaseService.getById(courseId);
+        courseBase.setStatus(CoursePublishStatus.PUBLISHED.getCode());
+        courseBaseService.updateById(courseBase);
+
+        coursePublishPreMapper.deleteById(courseId);
     }
 }

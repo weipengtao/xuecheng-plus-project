@@ -6,4 +6,6 @@ public interface CoursePublishService {
     CoursePreviewDTO getCoursePreview(Long courseId);
 
     void commitAudit(Long companyId, Long courseId);
+
+    void coursePublish(Long companyId, Long courseId);
 }
