@@ -81,7 +81,7 @@ public class MediaFilesController {
             minioService.uploadFile(minioProperty.getBucket().getOtherFiles(), objectName, file);
         } catch (Exception e) {
             log.error("上传文件失败, objectName: {}", objectName, e);
-            return RestResponse.error(e.getMessage());
+            return RestResponse.error(false, e.getMessage());
         }
         return RestResponse.success(true);
     }

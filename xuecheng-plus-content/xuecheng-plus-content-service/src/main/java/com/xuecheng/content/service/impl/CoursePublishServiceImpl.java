@@ -159,7 +159,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
                 // TODO 调用缓存服务接口，将课程信息缓存到 Redis
                 // mqMessage.setStageState3(TaskStatus.SUCCESS.getCode());
             }
-            mqMessageMapper.deleteById(mqMessage.getId());
+            // mqMessageMapper.deleteById(mqMessage.getId());
         } catch (Exception e) {
             log.error("处理课程发布任务失败，课程ID：{}", courseId, e);
         } finally {
