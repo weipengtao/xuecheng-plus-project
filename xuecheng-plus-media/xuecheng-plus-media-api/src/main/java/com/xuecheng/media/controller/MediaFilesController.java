@@ -6,19 +6,26 @@ import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.model.dto.MediaFilesPageQueryRequestDTO;
 import com.xuecheng.media.model.dto.UploadFileResultDTO;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.property.MinioProperty;
 import com.xuecheng.media.service.MediaFilesService;
+import com.xuecheng.media.service.MinioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "媒资管理接口", description = "实现媒资管理相关操作")
 public class MediaFilesController {
 
+    private final MinioProperty minioProperty;
+
     private final MediaFilesService mediaFilesService;
+    private final MinioService minioService;
 
     @PostMapping("/files")
     @Operation(summary = "课程查询接口", description = "分页查询课程信息")
@@ -63,5 +70,19 @@ public class MediaFilesController {
     @DeleteMapping("/{id}")
     public RestResponse<Boolean> delete(@PathVariable String id) {
         return RestResponse.success(mediaFilesService.deleteById(id));
+    }
+
+    @PostMapping("/upload/file")
+    @Operation(summary = "对外上传文件接口", description = "上传文件")
+    public RestResponse<Boolean> uploadOtherFile(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam("objectName") String objectName) {
+        try {
+            minioService.uploadFile(minioProperty.getBucket().getOtherFiles(), objectName, file);
+        } catch (Exception e) {
+            log.error("上传文件失败, objectName: {}", objectName, e);
+            return RestResponse.error(e.getMessage());
+        }
+        return RestResponse.success(true);
     }
 }

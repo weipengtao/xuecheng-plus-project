@@ -34,6 +34,8 @@
         <xxl-job-core.version>3.2.0</xxl-job-core.version>
         <freemarker.version>3.5.6</freemarker.version>
         <fastjson2.version>2.0.59</fastjson2.version>
+        <openfeign.version>4.3.0</openfeign.version>
+        <feign-form.version>3.8.0</feign-form.version>
     </properties>
 
     <dependencyManagement>
@@ -149,6 +151,18 @@
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+                <version>${openfeign.version}</version>
+            </dependency>
+            <!--feign支持Multipart格式传参-->
+            <dependency>
+                <groupId>io.github.openfeign.form</groupId>
+                <artifactId>feign-form-spring</artifactId>
+                <version>${feign-form.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
