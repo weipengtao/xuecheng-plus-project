@@ -3,7 +3,6 @@ package com.xuecheng.search.service.impl;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import com.xuecheng.search.model.dto.CourseSearchParamDTO;
 import com.xuecheng.search.model.dto.CourseSearchResultDTO;
 import com.xuecheng.search.model.po.CourseDoc;
