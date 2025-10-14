@@ -15,7 +15,7 @@ public class CourseIndexController {
     private final CourseIndexService courseIndexService;
 
     @PostMapping("/course")
-    public Boolean add(CourseDoc courseDoc){
+    public Boolean addCourseDoc(CourseDoc courseDoc){
         return courseIndexService.indexDocument(courseDoc);
     }
 }

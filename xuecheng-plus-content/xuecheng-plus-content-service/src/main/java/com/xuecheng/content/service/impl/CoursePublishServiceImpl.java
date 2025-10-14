@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.xuecheng.base.model.MemoryMultipartFile;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.content.clients.MediaServiceClient;
+import com.xuecheng.content.clients.SearchServiceClient;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.mapper.CoursePublishMapper;
 import com.xuecheng.content.mapper.CoursePublishPreMapper;
@@ -15,6 +16,7 @@ import com.xuecheng.content.model.po.*;
 import com.xuecheng.content.service.CourseBaseService;
 import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
+import com.xuecheng.search.model.po.CourseDoc;
 import com.xuecheng.system.model.enums.CourseAuditStatus;
 import com.xuecheng.system.model.enums.CoursePublishStatus;
 import com.xuecheng.system.model.enums.MessageType;
@@ -52,6 +54,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     private final MqMessageMapper mqMessageMapper;
 
     private final MediaServiceClient mediaServiceClient;
+    private final SearchServiceClient searchServiceClient;
 
     @Override
     public CoursePreviewDTO getCoursePreview(Long courseId) {
@@ -150,8 +153,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
             if (Objects.equals(mqMessage.getStageState2(), TaskStatus.INIT.getCode())) {
                 log.info("将课程信息索引到 Elasticsearch，课程ID：{}", courseId);
-                // TODO 调用搜索服务接口，将课程信息索引到 Elasticsearch
-                // mqMessage.setStageState2(TaskStatus.SUCCESS.getCode());
+                uploadToEs(courseId);
+                mqMessage.setStageState2(TaskStatus.SUCCESS.getCode());
             }
 
             if (Objects.equals(mqMessage.getStageState3(), TaskStatus.INIT.getCode())) {
@@ -164,6 +167,16 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             log.error("处理课程发布任务失败，课程ID：{}", courseId, e);
         } finally {
             mqMessageMapper.updateById(mqMessage);
+        }
+    }
+
+    private void uploadToEs(Long courseId) {
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        CourseDoc courseDoc = new CourseDoc();
+        BeanUtils.copyProperties(coursePublish, courseDoc);
+        Boolean added = searchServiceClient.addCourseDoc(courseDoc);
+        if (!added) {
+            throw new RuntimeException("课程信息索引到 Elasticsearch 失败");
         }
     }
 
