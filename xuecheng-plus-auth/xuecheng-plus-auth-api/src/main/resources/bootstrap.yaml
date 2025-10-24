@@ -18,7 +18,3 @@ spring:
           - data-id: shared-log-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
-  security:
-    oauth2:
-      client:
-        registration:
