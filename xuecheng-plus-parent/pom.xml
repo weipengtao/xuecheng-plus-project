@@ -18,6 +18,7 @@
         <module>../xuecheng-plus-media</module>
         <module>../xuecheng-plus-search</module>
         <module>../xuecheng-plus-auth</module>
+        <module>../xuecheng-plus-captcha</module>
     </modules>
 
     <properties>
@@ -39,6 +40,7 @@
         <openfeign.version>4.3.0</openfeign.version>
         <feign-form.version>3.8.0</feign-form.version>
         <elasticsearch-client.version>8.19.5</elasticsearch-client.version>
+        <kaptcha.version>2.3.2</kaptcha.version>
     </properties>
 
     <dependencyManagement>
@@ -172,6 +174,12 @@
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
                 <version>${elasticsearch-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.penggle</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
