@@ -1,6 +1,8 @@
 package com.xuecheng.auth.model.po;
 
 import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@Data
 @Builder
 @RequiredArgsConstructor
 public class SecurityUser implements UserDetails {
