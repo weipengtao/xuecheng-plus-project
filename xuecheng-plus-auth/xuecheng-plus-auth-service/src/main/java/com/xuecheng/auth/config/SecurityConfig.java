@@ -144,7 +144,7 @@ public class SecurityConfig {
 
                 // 可选：令牌有效期配置
                 .tokenSettings(TokenSettings.builder()
-                        .accessTokenTimeToLive(Duration.ofMinutes(5))
+                        .accessTokenTimeToLive(Duration.ofHours(10))
                         .refreshTokenTimeToLive(Duration.ofHours(1))
                         .build())
 
