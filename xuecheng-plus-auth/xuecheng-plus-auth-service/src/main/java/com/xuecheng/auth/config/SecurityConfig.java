@@ -128,7 +128,7 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 
                 // 对应 redirect_uris
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client")
+                .redirectUri("http://www.51xuecheng.cn/sign.html")
 
                 // 对应 post_logout_redirect_uris
                 .postLogoutRedirectUri("http://127.0.0.1:8080/")
