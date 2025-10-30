@@ -19,7 +19,7 @@ public class GatewaySecurityConfig {
         http
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(ignoreUrlsConfig.getUrls().toArray(new String[0])).permitAll()
-                        .anyExchange().permitAll())
+                        .anyExchange().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable);
