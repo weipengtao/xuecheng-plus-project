@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.xuecheng.auth.model.po.SecurityUser;
 import com.xuecheng.auth.model.po.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Configuration
 @EnableMethodSecurity   // 开启方法级别的权限控制
 public class SecurityConfig {
@@ -128,10 +130,10 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 
                 // 对应 redirect_uris
-                .redirectUri("http://www.51xuecheng.cn/sign.html")
+                .redirectUri("http://www.51xuecheng.cn/api/authorization-code/login/callback")
 
                 // 对应 post_logout_redirect_uris
-                .postLogoutRedirectUri("http://127.0.0.1:8080/")
+                .postLogoutRedirectUri("http://www.51xuecheng.cn")
 
                 // 对应 scopes
                 .scope(OidcScopes.OPENID)
@@ -197,10 +199,11 @@ public class SecurityConfig {
                 if (principal != null && principal.getPrincipal() instanceof SecurityUser securityUser) {
                     User user = securityUser.getUser();
 
-                    // 将 User 对象转成 Map
                     Map<String, Object> userMap = new HashMap<>();
                     userMap.put("id", user.getId());
+                    userMap.put("name", user.getName());
                     userMap.put("username", user.getUsername());
+                    userMap.put("role", securityUser.getAuthorities());
                     userMap.put("email", user.getEmail());
 
                     // 添加到 JWT payload

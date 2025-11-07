@@ -8,7 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-public class HelloController {
+public class HealthController {
+
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
+    }
 
     @GetMapping("/me")
     public Map<String, Object> me(@AuthenticationPrincipal Jwt jwt) {
