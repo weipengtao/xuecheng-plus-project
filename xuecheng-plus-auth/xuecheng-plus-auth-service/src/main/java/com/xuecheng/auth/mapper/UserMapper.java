@@ -3,6 +3,8 @@ package com.xuecheng.auth.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xuecheng.auth.model.po.User;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -13,4 +15,5 @@ import com.xuecheng.auth.model.po.User;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+    List<String> getAuthoritiesByUserId(String userId);
 }

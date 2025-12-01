@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -43,9 +44,8 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Configuration
@@ -199,11 +199,16 @@ public class SecurityConfig {
                 if (principal != null && principal.getPrincipal() instanceof SecurityUser securityUser) {
                     User user = securityUser.getUser();
 
+                    // 把权限写成 List<String>
+                    Set<String> authorities = securityUser.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toSet());
+
                     Map<String, Object> userMap = new HashMap<>();
                     userMap.put("id", user.getId());
                     userMap.put("name", user.getName());
                     userMap.put("username", user.getUsername());
-                    userMap.put("role", securityUser.getAuthorities());
+                    userMap.put("authorities", authorities);
                     userMap.put("email", user.getEmail());
 
                     // 添加到 JWT payload

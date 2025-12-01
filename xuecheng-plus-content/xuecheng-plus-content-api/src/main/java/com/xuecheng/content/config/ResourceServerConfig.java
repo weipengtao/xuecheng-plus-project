@@ -42,24 +42,21 @@ public class ResourceServerConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 
-        // 自定义权限提取器
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             Map<String, Object> user = jwt.getClaim("user");
             if (user == null) {
                 return List.of();
             }
 
-            // 你在授权服务器里把 role 放进 user.role 里
-            Object rolesObj = user.get("role");
-
-            if (rolesObj instanceof Collection<?> roles) {
-                return roles.stream()
-                        .map(Object::toString)
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+            Object authoritiesObj = user.get("authorities");
+            if (!(authoritiesObj instanceof Collection<?> authorities)) {
+                return List.of();
             }
 
-            return List.of();
+            return authorities.stream()
+                    .map(Object::toString)
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
         });
 
         return converter;

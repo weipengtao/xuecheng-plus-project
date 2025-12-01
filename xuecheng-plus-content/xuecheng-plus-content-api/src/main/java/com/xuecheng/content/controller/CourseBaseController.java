@@ -11,6 +11,7 @@ import com.xuecheng.content.service.CourseBaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,6 +35,7 @@ public class CourseBaseController {
         return courseBaseService.createCourseBase(companyId, addCourseDTO);
     }
 
+    @PreAuthorize("hasAuthority('xc_sysmanager')")
     @GetMapping("/{id}")
     @Operation(summary = "根据ID查询课程信息", description = "根据课程ID查询课程的基本信息和营销信息")
     public CourseBaseInfoDTO getById(@PathVariable Long id) {

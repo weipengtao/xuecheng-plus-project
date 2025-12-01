@@ -2,24 +2,22 @@ package com.xuecheng.auth.model.po;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
-@RequiredArgsConstructor
 public class SecurityUser implements UserDetails {
 
-    private final User user;
+    private User user;
+    private Set<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return authorities != null ? authorities : Set.of();
     }
 
     @Override
