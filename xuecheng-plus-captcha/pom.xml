@@ -74,7 +74,7 @@
                         </platforms>
                     </from>
                     <to>
-                        <image>registry:5000/${project.artifactId}:${project.version}</image>
+                        <image>registry:5000/captcha:latest</image>
                     </to>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <container>

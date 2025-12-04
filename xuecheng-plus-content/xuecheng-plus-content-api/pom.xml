@@ -92,7 +92,7 @@
                         </platforms>
                     </from>
                     <to>
-                        <image>registry:5000/${project.artifactId}:${project.version}</image>
+                        <image>registry:5000/content:latest</image>
                     </to>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <container>
