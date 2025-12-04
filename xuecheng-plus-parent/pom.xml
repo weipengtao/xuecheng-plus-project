@@ -41,6 +41,7 @@
         <feign-form.version>3.8.0</feign-form.version>
         <elasticsearch-client.version>8.19.5</elasticsearch-client.version>
         <kaptcha.version>2.3.2</kaptcha.version>
+        <jib-maven-plugin.version>3.4.6</jib-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
